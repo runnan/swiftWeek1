@@ -53,10 +53,17 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Do any additional setup after loading the view.
-        movieTableView.dataSource = self
-        movieTableView.delegate = self
-        getResultFromURL("https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        if Reachability.isConnectedToNetwork() == true {
+            // Do any additional setup after loading the view.
+            movieTableView.dataSource = self
+            movieTableView.delegate = self
+            getResultFromURL("https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        } else {
+            var alert = UIAlertView(title: "No Internet Connection", message: "Make sure your device is connected to the internet.", delegate: nil, cancelButtonTitle: "OK")
+            alert.show()
+        }
+        
+        
         
     }
     
