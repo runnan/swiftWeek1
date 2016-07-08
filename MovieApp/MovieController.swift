@@ -50,21 +50,60 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
         task.resume()
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
+    // Makes a network request to get updated data
+    // Updates the tableView with the new data
+    // Hides the RefreshControl
+    func refreshControlAction(refreshControl: UIRefreshControl) {
         if Reachability.isConnectedToNetwork() == true {
-            // Do any additional setup after loading the view.
-            movieTableView.dataSource = self
-            movieTableView.delegate = self
-            getResultFromURL("https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+            let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+            let request = NSURLRequest(
+                URL: url!,
+                cachePolicy: NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData,
+                timeoutInterval: 10)
+            
+            let session = NSURLSession(
+                configuration: NSURLSessionConfiguration.defaultSessionConfiguration(),
+                delegate: nil,
+                delegateQueue: NSOperationQueue.mainQueue()
+            )
+            
+            let task: NSURLSessionDataTask = session.dataTaskWithRequest(request,completionHandler: { (dataOrNil, response, error) in
+                if let data = dataOrNil {
+                    if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
+                        data, options:[]) as? NSDictionary {
+                        self.movies = responseDictionary["results"] as! [NSDictionary]
+                        self.movieTableView.reloadData()
+                        // Hide HUD once the network request comes back (must be done on main UI thread)
+                        refreshControl.endRefreshing()
+                    }
+                }
+            })
+            task.resume()
+            
         } else {
+            refreshControl.endRefreshing()
+            self.movies = [NSDictionary]()
+            self.movieTableView.reloadData()
             var alert = UIAlertView(title: "No Internet Connection", message: "Make sure your device is connected to the internet.", delegate: nil, cancelButtonTitle: "OK")
             alert.show()
         }
         
+    }
+    
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
+        // Initialize a UIRefreshControl
+        let refreshControl = UIRefreshControl()
         
+        // Do any additional setup after loading the view.
+        movieTableView.dataSource = self
+        movieTableView.delegate = self
+        getResultFromURL("https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), forControlEvents: UIControlEvents.ValueChanged)
+        movieTableView.insertSubview(refreshControl, atIndex: 0)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
