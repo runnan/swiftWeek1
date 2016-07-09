@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+    
        window = UIWindow(frame: UIScreen.mainScreen().bounds)
         let storyBoard = UIStoryboard(name: "Main", bundle: nil)
         
@@ -35,11 +36,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         topRatedViewController.tabBarItem.image = UIImage.fontAwesomeIconWithName(.Group, textColor: UIColor.blackColor(), size: CGSizeMake(30, 30))
         
         let tabBarController = UITabBarController()
+        
         tabBarController.viewControllers = [nowPlayingViewController, topRatedViewController]
         
-        window?.rootViewController = tabBarController
-        window?.makeKeyAndVisible()
+        //Need create navigationController to pass value to detail controller
+        let nav = UINavigationController()
+        nav.viewControllers = [tabBarController]
         
+        
+        window?.rootViewController = nav
+        window?.makeKeyAndVisible()
+ 
         return true
     }
 

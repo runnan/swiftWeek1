@@ -18,7 +18,8 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
     let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
     
     var movies = [NSDictionary]()
-    var endPoint:String!
+    //var endPoint:String!
+    var endPoint:String! = "now_playing"
     
     func getResultFromURL(url:String){
         
@@ -142,11 +143,21 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
      // MARK: - Navigation
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?){
+        /*
+        print(segue.identifier)
+        let tabBarController = segue.destinationViewController as! UITabBarController
+        let nav = tabBarController.viewControllers![2] as! UINavigationController
+        let destinationViewController = nav.topViewController as! DetailViewController
+        let ip = movieTableView.indexPathForSelectedRow
+        destinationViewController.overview = movies[(ip?.row)!]["overview"] as! String
+        destinationViewController.posterUrlString = posterBaseUrl + (movies[(ip?.row)!]["poster_path"] as! String)
+*/
+        
         let nextVC = segue.destinationViewController as! DetailViewController
         let ip = movieTableView.indexPathForSelectedRow
         nextVC.overview = movies[(ip?.row)!]["overview"] as! String
-        
         nextVC.posterUrlString = posterBaseUrl + (movies[(ip?.row)!]["poster_path"] as! String)
+        
     }
  
     
