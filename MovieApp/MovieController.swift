@@ -18,6 +18,7 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
     let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
     
     var movies = [NSDictionary]()
+    var endPoint:String!
     
     func getResultFromURL(url:String){
         
@@ -55,7 +56,7 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
     // Hides the RefreshControl
     func refreshControlAction(refreshControl: UIRefreshControl) {
         if Reachability.isConnectedToNetwork() == true {
-            let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+            let url = NSURL(string:"https://api.themoviedb.org/3/movie/\(endPoint)?api_key=\(apiKey)")
             let request = NSURLRequest(
                 URL: url!,
                 cachePolicy: NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData,
@@ -101,7 +102,7 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
         // Do any additional setup after loading the view.
         movieTableView.dataSource = self
         movieTableView.delegate = self
-        getResultFromURL("https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        getResultFromURL("https://api.themoviedb.org/3/movie/\(endPoint)?api_key=\(apiKey)")
         refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), forControlEvents: UIControlEvents.ValueChanged)
         movieTableView.insertSubview(refreshControl, atIndex: 0)
     }
