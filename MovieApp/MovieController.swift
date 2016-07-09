@@ -18,8 +18,7 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
     let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
     
     var movies = [NSDictionary]()
-    //var endPoint:String!
-    var endPoint:String! = "now_playing"
+    var endPoint:String!
     
     func getResultFromURL(url:String){
         

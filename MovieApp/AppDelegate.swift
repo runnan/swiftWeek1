@@ -33,18 +33,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let topRatedViewController = topRatedNavigationController.topViewController as! MovieController
         topRatedViewController.endPoint = "top_rated"
         topRatedViewController.tabBarItem.title = "Top Rated"
-        topRatedViewController.tabBarItem.image = UIImage.fontAwesomeIconWithName(.Group, textColor: UIColor.blackColor(), size: CGSizeMake(30, 30))
+        topRatedViewController.tabBarItem.image = UIImage.fontAwesomeIconWithName(.Star, textColor: UIColor.blackColor(), size: CGSizeMake(30, 30))
         
         let tabBarController = UITabBarController()
         
         tabBarController.viewControllers = [nowPlayingViewController, topRatedViewController]
         
         //Need create navigationController to pass value to detail controller
-        let nav = UINavigationController()
-        nav.viewControllers = [tabBarController]
+        let navigationController = UINavigationController()
+        navigationController.viewControllers = [tabBarController]
         
         
-        window?.rootViewController = nav
+        
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
  
         return true
