@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FontAwesome_swift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -24,12 +25,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let nowPlayingViewController = nowPlayingNavigationController.topViewController as! MovieController
         nowPlayingViewController.endPoint = "now_playing"
         nowPlayingViewController.tabBarItem.title = "Now Playing"
+        nowPlayingViewController.tabBarItem.image = UIImage.fontAwesomeIconWithName(.Film, textColor: UIColor.blackColor(), size: CGSizeMake(30, 30))
         
         let topRatedNavigationController = storyBoard.instantiateViewControllerWithIdentifier("movieNavigationController") as! UINavigationController
         
         let topRatedViewController = topRatedNavigationController.topViewController as! MovieController
         topRatedViewController.endPoint = "top_rated"
         topRatedViewController.tabBarItem.title = "Top Rated"
+        topRatedViewController.tabBarItem.image = UIImage.fontAwesomeIconWithName(.Group, textColor: UIColor.blackColor(), size: CGSizeMake(30, 30))
         
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [nowPlayingViewController, topRatedViewController]
