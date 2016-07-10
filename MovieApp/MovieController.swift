@@ -17,9 +17,10 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
     
     @IBOutlet weak var movieTableView: UITableView!
     
+    
     //var searchResults =[String]()
     
-    var posterBaseUrl = "http://image.tmdb.org/t/p/w500"
+    var posterBaseUrl = "http://image.tmdb.org/t/p/w342"
     let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
     
     var movies = [NSDictionary]()
@@ -98,7 +99,6 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
             task.resume()
             
         } else {
-            print("noconnec")
             refreshControl.endRefreshing()
             self.movies = [NSDictionary]()
             self.movieTableView.reloadData()
@@ -143,13 +143,44 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
         }
         
         let cell = movieTableView.dequeueReusableCellWithIdentifier("movieCell") as! MovieTableViewCell
+        
+        // Use a red color when the user selects the cell
+        let backgroundView = UIView()
+        backgroundView.backgroundColor = UIColor.grayColor()
+        cell.selectedBackgroundView = backgroundView
+        
         cell.titleLabel.text = moviesResult[indexPath.row]["title"] as? String
         cell.overViewLabel.text = moviesResult[indexPath.row]["overview"] as? String
         
         if let posterPath = moviesResult[indexPath.row]["poster_path"] as? String {
             let posterUrl = NSURL(string: posterBaseUrl + posterPath)
             
-            cell.movieImage.setImageWithURL(posterUrl!)
+            //cell.movieImage.setImageWithURL(posterUrl!)
+            
+            let imageRequest = NSURLRequest(URL: NSURL(string: posterBaseUrl + posterPath)!)
+            
+            cell.movieImage.setImageWithURLRequest(
+                imageRequest,
+                placeholderImage: nil,
+                success: { (imageRequest, imageResponse, image) -> Void in
+                    
+                    // imageResponse will be nil if the image is cached
+                    if imageResponse != nil {
+                        print("Image was NOT cached, fade in image")
+                        cell.movieImage.alpha = 0.0
+                        cell.movieImage.image = image
+                        UIView.animateWithDuration(0.3, animations: { () -> Void in
+                            cell.movieImage.alpha = 1.0
+                        })
+                    } else {
+                        print("Image was cached so just update the image")
+                        cell.movieImage.image = image
+                    }
+                },
+                failure: { (imageRequest, imageResponse, error) -> Void in
+                    var alert = UIAlertView(title: "Cannot get the images", message: "Make sure your device is connected to the internet.", delegate: nil, cancelButtonTitle: "OK")
+                    alert.show()
+            })
         }
         else {
             // No poster image. Can either set to nil (no image) or a default movie poster image
@@ -170,20 +201,11 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
      // MARK: - Navigation
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?){
-        /*
-        print(segue.identifier)
-        let tabBarController = segue.destinationViewController as! UITabBarController
-        let nav = tabBarController.viewControllers![2] as! UINavigationController
-        let destinationViewController = nav.topViewController as! DetailViewController
-        let ip = movieTableView.indexPathForSelectedRow
-        destinationViewController.overview = movies[(ip?.row)!]["overview"] as! String
-        destinationViewController.posterUrlString = posterBaseUrl + (movies[(ip?.row)!]["poster_path"] as! String)
-*/
         
         let nextVC = segue.destinationViewController as! DetailViewController
         let ip = movieTableView.indexPathForSelectedRow
         nextVC.overview = movies[(ip?.row)!]["overview"] as! String
-        nextVC.posterUrlString = posterBaseUrl + (movies[(ip?.row)!]["poster_path"] as! String)
+        nextVC.posterUrlString = (movies[(ip?.row)!]["poster_path"] as! String)
         
     }
     

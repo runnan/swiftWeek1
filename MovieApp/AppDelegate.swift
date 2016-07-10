@@ -43,7 +43,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let navigationController = UINavigationController()
         navigationController.viewControllers = [tabBarController]
         
-        
+        navigationController.navigationBar.setBackgroundImage(UIImage(named: "codepath-logo"), forBarMetrics: .Default)
+        navigationController.navigationBar.tintColor = UIColor.blackColor()
         
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
