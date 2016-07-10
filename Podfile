@@ -9,4 +9,5 @@ target 'MovieApp' do
   pod 'AFNetworking', '~> 2.6'
   pod 'MBProgressHUD'
   pod 'FontAwesome.swift'
+  pod 'ReachabilitySwift'
 end

@@ -22,17 +22,20 @@ PODS:
     - AFNetworking/NSURLSession
   - FontAwesome.swift (0.7.3)
   - MBProgressHUD (0.9.2)
+  - ReachabilitySwift (2.3.3)
 
 DEPENDENCIES:
   - AFNetworking (~> 2.6)
   - FontAwesome.swift
   - MBProgressHUD
+  - ReachabilitySwift
 
 SPEC CHECKSUMS:
   AFNetworking: cb8d14a848e831097108418f5d49217339d4eb60
   FontAwesome.swift: f694fe0f667d6d3390b5919cdb0556a27b75d427
   MBProgressHUD: 1569cf7ace17a8bac47aabfbb8580a49690386d1
+  ReachabilitySwift: e0f6b6f280effb47731acfaaa2d5ffe223703793
 
-PODFILE CHECKSUM: e391a5e5b09ee33af7cb63359da65f4804946251
+PODFILE CHECKSUM: e85d66ba7bfc17a2d870f2876e5589f1fcdf4143
 
 COCOAPODS: 1.0.1

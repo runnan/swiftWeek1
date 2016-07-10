@@ -9,19 +9,27 @@
 import UIKit
 import AFNetworking
 import MBProgressHUD
+import ReachabilitySwift
 
-class MovieController: UIViewController,UITableViewDataSource, UITableViewDelegate{
+class MovieController: UIViewController,UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate{
+    
+    @IBOutlet weak var searchBar: UISearchBar!
     
     @IBOutlet weak var movieTableView: UITableView!
+    
+    //var searchResults =[String]()
     
     var posterBaseUrl = "http://image.tmdb.org/t/p/w500"
     let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
     
     var movies = [NSDictionary]()
+    var moviesSearch = [NSDictionary]()
+    // search in progress or not
+    var isSearching : Bool = false
     var endPoint:String!
     
     func getResultFromURL(url:String){
-        
+        if Reachability.isConnectedToNetwork() == true {
         let url = NSURL(string: url)
         let request = NSURLRequest(
             URL: url!,
@@ -49,6 +57,14 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
             }
         })
         task.resume()
+        } else {
+            print("noconnec")
+            self.movies = [NSDictionary]()
+            self.movieTableView.reloadData()
+            var alert = UIAlertView(title: "No Internet Connection", message: "Make sure your device is connected to the internet.", delegate: nil, cancelButtonTitle: "OK")
+            alert.show()
+        }
+
     }
     
     // Makes a network request to get updated data
@@ -82,6 +98,7 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
             task.resume()
             
         } else {
+            print("noconnec")
             refreshControl.endRefreshing()
             self.movies = [NSDictionary]()
             self.movieTableView.reloadData()
@@ -102,23 +119,34 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
         // Do any additional setup after loading the view.
         movieTableView.dataSource = self
         movieTableView.delegate = self
+        self.searchBar.delegate = self
         getResultFromURL("https://api.themoviedb.org/3/movie/\(endPoint)?api_key=\(apiKey)")
         refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), forControlEvents: UIControlEvents.ValueChanged)
         movieTableView.insertSubview(refreshControl, atIndex: 0)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
-        return movies.count
+        if self.isSearching == true {
+            return self.moviesSearch.count
+        }else {
+            return self.movies.count
+        }
     }
     
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell{
-        let cell = movieTableView.dequeueReusableCellWithIdentifier("movieCell") as! MovieTableViewCell
-        //cell!.textLabel?.text = movies[indexPath.row]["title"] as! String
-        cell.titleLabel.text = movies[indexPath.row]["title"] as? String
-        cell.overViewLabel.text = movies[indexPath.row]["overview"] as? String
+        var moviesResult = [NSDictionary]()
+        if self.isSearching == true {
+            moviesResult = moviesSearch
+        }else{
+            moviesResult = movies
+        }
         
-        if let posterPath = movies[indexPath.row]["poster_path"] as? String {
+        let cell = movieTableView.dequeueReusableCellWithIdentifier("movieCell") as! MovieTableViewCell
+        cell.titleLabel.text = moviesResult[indexPath.row]["title"] as? String
+        cell.overViewLabel.text = moviesResult[indexPath.row]["overview"] as? String
+        
+        if let posterPath = moviesResult[indexPath.row]["poster_path"] as? String {
             let posterUrl = NSURL(string: posterBaseUrl + posterPath)
             
             cell.movieImage.setImageWithURL(posterUrl!)
@@ -158,6 +186,44 @@ class MovieController: UIViewController,UITableViewDataSource, UITableViewDelega
         nextVC.posterUrlString = posterBaseUrl + (movies[(ip?.row)!]["poster_path"] as! String)
         
     }
- 
     
-}
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        if self.searchBar.text!.isEmpty {
+            print("Empty")
+            // set searching false
+            self.isSearching = false
+            
+            // reload table view
+            self.movieTableView.reloadData()
+            
+        }else{
+            
+            // set searghing true
+            self.isSearching = true
+            
+            // empty searching array
+            self.moviesSearch.removeAll(keepCapacity: false)
+            
+            // find matching item and add it to the searcing array
+            for i in 0..<self.movies.count {
+                //let listItem : String = self.fruitList[i]
+                if movies[i]["overview"]!.lowercaseString.rangeOfString(self.searchBar.text!.lowercaseString) != nil
+                || movies[i]["title"]!.lowercaseString.rangeOfString(self.searchBar.text!.lowercaseString) != nil{
+                    self.moviesSearch.append(movies[i])
+                }
+            }
+            
+            self.movieTableView.reloadData()        }
+        
+    }
+ 
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        
+    }
+    
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        searchBar.text = ""
+        self.movieTableView.reloadData()
+    }}
